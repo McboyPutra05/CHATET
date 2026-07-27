@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #10b981;
+  --color-primary-dark: #059669;
+  --color-danger: #ef4444;
+  --color-danger-dark: #dc2626;
+  --color-bg-dark: #0f172a;
+  --color-bg-panel: #1e293b;
+  --color-border: #334155;
+  --color-text: #f8fafc;
+  --color-text-muted: #94a3b8;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--color-bg-dark)] text-[var(--color-text)] font-sans antialiased selection:bg-[var(--color-primary)] selection:text-white;
+  }
+}
