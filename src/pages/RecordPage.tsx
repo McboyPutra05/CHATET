@@ -75,32 +75,32 @@ export const RecordPage = () => {
       {/* Quick Add Form */}
       <Card className="border-white/5 bg-slate-900/50">
         <CardContent className="p-6">
-          <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="md:col-span-2">
+          <form onSubmit={handleAdd} className="grid grid-cols-2 md:grid-cols-12 gap-4">
+            <div className="col-span-1 md:col-span-2">
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none [&::-webkit-calendar-picker-indicator]:invert" />
             </div>
-            <div className="md:col-span-2">
+            <div className="col-span-1 md:col-span-3">
+              <input type="text" placeholder="Kategori (Makan, dll...)" value={category} onChange={(e) => setCategory(e.target.value)} required
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none" />
+            </div>
+            <div className="col-span-1 md:col-span-2">
               <select value={type} onChange={(e) => setType(e.target.value as 'in' | 'out')}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none">
                 <option value="out">Pengeluaran</option>
                 <option value="in">Pemasukan</option>
               </select>
             </div>
-            <div className="md:col-span-3">
-              <input type="text" placeholder="Kategori (Makan, Bensin...)" value={category} onChange={(e) => setCategory(e.target.value)} required
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none" />
-            </div>
-            <div className="md:col-span-2">
+            <div className="col-span-1 md:col-span-2">
               <input type="number" placeholder="Nominal (Rp)" value={amount} onChange={(e) => setAmount(e.target.value)} required
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none" />
             </div>
-            <div className="md:col-span-2">
+            <div className="col-span-2 md:col-span-2">
               <input type="text" placeholder="Catatan (Opsional)" value={notes} onChange={(e) => setNotes(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none" />
             </div>
-            <div className="md:col-span-1">
-              <button type="submit" className="w-full h-full flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-all shadow-lg shadow-emerald-500/20">
+            <div className="col-span-2 md:col-span-1">
+              <button type="submit" className="w-full min-h-[50px] md:h-full flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98]">
                 <Plus className="w-5 h-5" />
               </button>
             </div>
