@@ -80,16 +80,16 @@ export const RecordPage = () => {
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none [&::-webkit-calendar-picker-indicator]:invert" />
             </div>
-            <div className="col-span-1 md:col-span-3">
-              <input type="text" placeholder="Kategori (Makan, dll...)" value={category} onChange={(e) => setCategory(e.target.value)} required
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none" />
-            </div>
             <div className="col-span-1 md:col-span-2">
               <select value={type} onChange={(e) => setType(e.target.value as 'in' | 'out')}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none">
                 <option value="out">Pengeluaran</option>
                 <option value="in">Pemasukan</option>
               </select>
+            </div>
+            <div className="col-span-1 md:col-span-3">
+              <input type="text" placeholder="Kategori (Makan, dll...)" value={category} onChange={(e) => setCategory(e.target.value)} required
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none" />
             </div>
             <div className="col-span-1 md:col-span-2">
               <input type="number" placeholder="Nominal (Rp)" value={amount} onChange={(e) => setAmount(e.target.value)} required
