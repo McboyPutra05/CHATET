@@ -6,12 +6,14 @@ import {
 } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useBudgetStore } from '../store/useBudgetStore';
+import { useAuthStore } from '../store/useAuthStore';
 import type { Expense } from '../store/useBudgetStore';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Plus, Download, Trash2 } from 'lucide-react';
 
 export const ExpenseTable = () => {
   const { expenses, addExpense, deleteExpense } = useBudgetStore();
+  const { user } = useAuthStore();
   
   // Quick Add Form State
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -20,17 +22,17 @@ export const ExpenseTable = () => {
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || isNaN(Number(amount))) return;
+    if (!amount || isNaN(Number(amount)) || !user?.id) return;
     
-    addExpense({
+    await addExpense({
       date,
       type,
       category: category || 'Uncategorized',
       amount: Number(amount),
       notes
-    });
+    }, user.id);
     
     // Reset minimal
     setAmount('');

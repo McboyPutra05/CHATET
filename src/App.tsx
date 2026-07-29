@@ -4,6 +4,7 @@ import { AppLayout } from './components/layout/AppLayout';
 import { RecordPage } from './pages/RecordPage';
 import { TargetPage } from './pages/TargetPage';
 import { LoginPage } from './pages/LoginPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { supabase } from './lib/supabase';
 import { useAuthStore } from './store/useAuthStore';
@@ -35,6 +36,7 @@ function App() {
         <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/" element={<RecordPage />} />
           <Route path="/target" element={<TargetPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />

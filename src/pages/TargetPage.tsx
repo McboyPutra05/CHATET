@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Target, CalendarDays, TrendingDown, Save, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '../lib/utils';
 
+import { useAuthStore } from '../store/useAuthStore';
+
 export const TargetPage = () => {
-  const { totalTargetBudget, totalDays, startDate, setBudgetParams, plannedSpends, setPlannedSpends } = useBudgetStore();
+  const { user } = useAuthStore();
+  const { totalTargetBudget, totalDays, startDate, setBudgetParams, plannedSpends, setPlannedSpend } = useBudgetStore();
   const [localSpends, setLocalSpends] = useState<Record<string, number>>(plannedSpends);
   const { simulation } = useSimulation(localSpends);
   
@@ -19,10 +22,10 @@ export const TargetPage = () => {
   // Calculate total spent based on the simulation table (which includes user inputs)
   const simulationTotalSpent = simulation.reduce((sum, day) => sum + day.actualSpent, 0);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBudgetParams(formBudget, formDays, formDate);
-    setPlannedSpends(localSpends);
+    if (!user?.id) return;
+    await setBudgetParams(formBudget, formDays, formDate, user.id);
     setShowSaved(true);
     setTimeout(() => setShowSaved(false), 3000);
   };
@@ -172,6 +175,11 @@ export const TargetPage = () => {
                             onChange={(e) => {
                               const val = e.target.value === '' ? undefined : Number(e.target.value);
                               setLocalSpends(prev => ({ ...prev, [day.dateStr]: val as number }));
+                            }}
+                            onBlur={async (e) => {
+                              if (!user?.id) return;
+                              const val = e.target.value === '' ? 0 : Number(e.target.value);
+                              await setPlannedSpend(day.dateStr, val, user.id);
                             }}
                             className={cn(
                               "bg-slate-950 border rounded-lg px-3 py-1.5 text-sm w-32 outline-none focus:ring-2 focus:ring-emerald-500/50 transition-colors text-right font-bold",

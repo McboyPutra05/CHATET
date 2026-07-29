@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useBudgetStore } from '../store/useBudgetStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { useAdaptiveBudget } from '../hooks/useAdaptiveBudget';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Wallet, CalendarDays, TrendingDown, Target, Settings2 } from 'lucide-react';
 
 export const Dashboard = () => {
   const { totalTargetBudget, totalDays, startDate, setBudgetParams } = useBudgetStore();
+  const { user } = useAuthStore();
   const { remainingBudget, remainingDays, newDailyAllowance, isOverBudget, totalSpent } = useAdaptiveBudget();
   const [isEditing, setIsEditing] = useState(false);
   
@@ -13,9 +15,10 @@ export const Dashboard = () => {
   const [formDays, setFormDays] = useState(totalDays);
   const [formDate, setFormDate] = useState(startDate);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBudgetParams(formBudget, formDays, formDate);
+    if (!user?.id) return;
+    await setBudgetParams(formBudget, formDays, formDate, user.id);
     setIsEditing(false);
   };
 

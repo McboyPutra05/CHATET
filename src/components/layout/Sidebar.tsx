@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { WalletMinimal, Target, LayoutDashboard, X, LogOut } from 'lucide-react';
+import { WalletMinimal, Target, LayoutDashboard, X, LogOut, User } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { supabase } from '../../lib/supabase';
 
@@ -13,6 +13,7 @@ export const Sidebar = ({ onClose }: SidebarProps) => {
   const navItems = [
     { name: 'Pencatatan', path: '/', icon: LayoutDashboard },
     { name: 'Target & Durasi', path: '/target', icon: Target },
+    { name: 'Profil', path: '/profile', icon: User },
   ];
 
   return (

@@ -1,17 +1,35 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { Menu, WalletMinimal } from 'lucide-react';
+import { Menu, WalletMinimal, Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useAuthStore } from '../../store/useAuthStore';
+import { useBudgetStore } from '../../store/useBudgetStore';
 
 export const AppLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuthStore();
+  const { initializeData, isInitialized } = useBudgetStore();
 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    if (user?.id) {
+      initializeData(user.id);
+    }
+  }, [user?.id, initializeData]);
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col md:flex-row h-[100dvh] bg-slate-950 text-white overflow-hidden font-sans">

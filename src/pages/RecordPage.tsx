@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useBudgetStore } from '../store/useBudgetStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { Card, CardContent } from '../components/ui/card';
 import { Wallet, Plus, Trash2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export const RecordPage = () => {
   const { totalTargetBudget, expenses, addExpense, deleteExpense } = useBudgetStore();
+  const { user } = useAuthStore();
   
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [type, setType] = useState<'out' | 'in'>('out');
@@ -17,16 +19,16 @@ export const RecordPage = () => {
   const remainingBudget = totalTargetBudget - totalSpent;
   const isOverBudget = remainingBudget < 0;
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || isNaN(Number(amount))) return;
-    addExpense({
+    if (!amount || isNaN(Number(amount)) || !user?.id) return;
+    await addExpense({
       date,
       type,
       category: category || 'Uncategorized',
       amount: Number(amount),
       notes
-    });
+    }, user.id);
     setAmount('');
     setNotes('');
   };
