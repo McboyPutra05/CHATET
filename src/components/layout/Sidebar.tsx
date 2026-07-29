@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import { WalletMinimal, Target, LayoutDashboard, X } from 'lucide-react';
+import { WalletMinimal, Target, LayoutDashboard, X, LogOut } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { supabase } from '../../lib/supabase';
 
 interface SidebarProps {
   onClose?: () => void;
@@ -58,8 +59,17 @@ export const Sidebar = ({ onClose }: SidebarProps) => {
         })}
       </nav>
       
-      <div className="p-6 border-t border-white/5 text-xs text-slate-500 text-center">
-        Extreme Saving V2
+      <div className="p-4 border-t border-white/5 space-y-4">
+        <button
+          onClick={async () => await supabase.auth.signOut()}
+          className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Keluar (Logout)
+        </button>
+        <div className="text-xs text-slate-500 text-center">
+          Extreme Saving V2
+        </div>
       </div>
     </aside>
   );
