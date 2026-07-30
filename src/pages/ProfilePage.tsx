@@ -1,23 +1,34 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { supabase } from '../lib/supabase';
-import { Card, CardContent } from '../components/ui/card';
-import { User, Upload, Save, Loader2 } from 'lucide-react';
+import { Upload, Loader2, Edit2, Check, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export const ProfilePage = () => {
   const { user, setUser } = useAuthStore();
   
-  const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
-  const [avatarUrl, setAvatarUrl] = useState(user?.user_metadata?.avatar_url || '');
+  const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState({ text: '', type: '' });
+
+  // Form states based on user_metadata
+  const meta = user?.user_metadata || {};
+  const [formData, setFormData] = useState({
+    firstName: meta.first_name || meta.full_name?.split(' ')[0] || '',
+    lastName: meta.last_name || meta.full_name?.split(' ').slice(1).join(' ') || '',
+    phone: meta.phone || '',
+    bio: meta.bio || '',
+    country: meta.country || '',
+    city: meta.city || '',
+    postalCode: meta.postal_code || '',
+    taxId: meta.tax_id || ''
+  });
 
   const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setIsUploading(true);
-      setMessage('');
+      setMessage({ text: '', type: '' });
       
       const file = e.target.files?.[0];
       if (!file) return;
@@ -26,141 +37,193 @@ export const ProfilePage = () => {
       const fileName = `${user?.id}-${Math.random()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
-      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
       
-      setAvatarUrl(data.publicUrl);
+      // Update auth user metadata immediately with new avatar
+      const { data: updatedUser, error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: data.publicUrl }
+      });
+      
+      if (updateError) throw updateError;
+      
+      if (updatedUser.user) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        setUser(updatedUser.user, sessionData.session);
+      }
+
     } catch (error: any) {
-      setMessage(`Gagal mengunggah foto: ${error.message}`);
+      setMessage({ text: `Gagal mengunggah foto: ${error.message}`, type: 'error' });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleSaveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveProfile = async () => {
     try {
       setIsSaving(true);
-      setMessage('');
+      setMessage({ text: '', type: '' });
+      
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
       
       const { data, error } = await supabase.auth.updateUser({
         data: {
           full_name: fullName,
-          avatar_url: avatarUrl,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          phone: formData.phone,
+          bio: formData.bio,
+          country: formData.country,
+          city: formData.city,
+          postal_code: formData.postalCode,
+          tax_id: formData.taxId,
         }
       });
 
       if (error) throw error;
       
       if (data.user) {
-        // We get the current session to update our store properly
         const { data: sessionData } = await supabase.auth.getSession();
         setUser(data.user, sessionData.session);
-        setMessage('Profil berhasil diperbarui!');
+        setMessage({ text: 'Profil berhasil diperbarui!', type: 'success' });
+        setIsEditing(false);
       }
       
     } catch (error: any) {
-      setMessage(`Gagal menyimpan: ${error.message}`);
+      setMessage({ text: `Gagal menyimpan: ${error.message}`, type: 'error' });
     } finally {
       setIsSaving(false);
     }
   };
 
+  const InputField = ({ label, value, field }: { label: string, value: string, field: keyof typeof formData }) => (
+    <div className="space-y-1">
+      <p className="text-sm font-medium text-slate-400">{label}</p>
+      {isEditing ? (
+        <input 
+          type="text" 
+          value={formData[field]}
+          onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
+        />
+      ) : (
+        <p className="text-slate-100 font-medium py-2">{value || '-'}</p>
+      )}
+    </div>
+  );
+
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto pb-12">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Profil Pengguna</h2>
-        <p className="text-slate-400 mt-1">Kelola informasi pribadi dan pengaturan akun Anda.</p>
+    <div className="space-y-6 max-w-4xl mx-auto pb-12 animate-in fade-in duration-500">
+      
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl font-bold tracking-tight">My Profile</h2>
+        {message.text && (
+          <div className={cn(
+            "px-4 py-2 rounded-lg text-sm font-medium animate-in slide-in-from-top-2",
+            message.type === 'error' ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+          )}>
+            {message.text}
+          </div>
+        )}
       </div>
 
-      <Card className="border-white/5 bg-slate-900/50 shadow-xl relative overflow-hidden">
-        {/* Decorative background */}
-        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-          <User className="w-64 h-64 text-emerald-500 transform rotate-12" />
-        </div>
-
-        <CardContent className="pt-8 relative z-10">
-          <form onSubmit={handleSaveProfile} className="space-y-8">
-            
-            {/* Avatar Section */}
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="relative group">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-800 bg-slate-950 flex items-center justify-center relative">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <User className="w-12 h-12 text-slate-500" />
-                  )}
-                  {isUploading && (
-                    <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
-                      <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-                    </div>
-                  )}
+      {/* Header Card */}
+      <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left w-full">
+          <div className="relative group shrink-0">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-slate-800 bg-slate-950 flex items-center justify-center relative">
+              {meta.avatar_url ? (
+                <img src={meta.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-3xl">
+                  {meta.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase()}
                 </div>
-                
-                {/* Upload Button */}
-                <label className="absolute bottom-0 right-0 bg-emerald-500 p-2 rounded-full cursor-pointer hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 border border-emerald-400/50">
-                  <Upload className="w-5 h-5 text-white" />
-                  <input 
-                    type="file" 
-                    accept="image/*"
-                    onChange={handleUploadAvatar} 
-                    className="hidden" 
-                    disabled={isUploading}
-                  />
-                </label>
-              </div>
-              
-              <div className="text-center md:text-left space-y-1">
-                <h3 className="text-xl font-bold text-slate-100">{fullName || 'Pengguna Baru'}</h3>
-                <p className="text-slate-400 text-sm">{user?.email}</p>
-              </div>
+              )}
+              {isUploading && (
+                <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+                </div>
+              )}
             </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">Nama Lengkap</label>
-                <input 
-                  type="text" 
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Masukkan nama lengkap..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all"
-                />
-              </div>
-            </div>
-
-            {message && (
-              <div className={cn(
-                "p-4 rounded-xl border text-sm font-medium",
-                message.includes('Gagal') 
-                  ? "bg-rose-500/10 border-rose-500/20 text-rose-400" 
-                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-              )}>
-                {message}
+            <label className="absolute bottom-0 right-0 bg-emerald-500 p-2 rounded-full cursor-pointer hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 border border-emerald-400/50">
+              <Upload className="w-4 h-4 text-white" />
+              <input type="file" accept="image/*" onChange={handleUploadAvatar} className="hidden" disabled={isUploading} />
+            </label>
+          </div>
+          
+          <div className="flex-1">
+            <h3 className="text-2xl font-bold text-white">{meta.full_name || 'Pengguna Baru'}</h3>
+            <p className="text-slate-400">{meta.bio || 'Member'}</p>
+            <p className="text-slate-500 text-sm mt-1">{meta.city ? `${meta.city}, ${meta.country}` : 'Lokasi belum diatur'}</p>
+          </div>
+          
+          <div className="shrink-0">
+            {!isEditing ? (
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl transition-colors border border-slate-700"
+              >
+                <Edit2 className="w-4 h-4" />
+                <span>Edit</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setIsEditing(false)}
+                  className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl transition-colors border border-slate-700"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={handleSaveProfile}
+                  disabled={isSaving}
+                  className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50"
+                >
+                  {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  <span>Save</span>
+                </button>
               </div>
             )}
+          </div>
+        </div>
+      </div>
 
-            <div className="pt-4 flex justify-end">
-              <button 
-                type="submit" 
-                disabled={isSaving || isUploading}
-                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98]"
-              >
-                {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                Simpan Profil
-              </button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+      {/* Personal Information Card */}
+      <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl">
+        <h3 className="text-lg font-bold text-white mb-6">Personal Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <InputField label="First Name" value={formData.firstName} field="firstName" />
+          <InputField label="Last Name" value={formData.lastName} field="lastName" />
+          
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-slate-400">Email address</p>
+            <p className="text-slate-100 font-medium py-2">{user?.email}</p>
+          </div>
+          
+          <InputField label="Phone" value={formData.phone} field="phone" />
+          
+          <div className="md:col-span-2">
+            <InputField label="Bio" value={formData.bio} field="bio" />
+          </div>
+        </div>
+      </div>
+
+      {/* Address Card */}
+      <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl">
+        <h3 className="text-lg font-bold text-white mb-6">Address</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <InputField label="Country" value={formData.country} field="country" />
+          <InputField label="City/State" value={formData.city} field="city" />
+          <InputField label="Postal Code" value={formData.postalCode} field="postalCode" />
+          <InputField label="TAX ID" value={formData.taxId} field="taxId" />
+        </div>
+      </div>
+
     </div>
   );
 };
