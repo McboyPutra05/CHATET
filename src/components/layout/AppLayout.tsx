@@ -5,12 +5,16 @@ import { Menu, WalletMinimal, Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useBudgetStore } from '../../store/useBudgetStore';
+import { useAutoLogout } from '../../hooks/useAutoLogout';
 
 export const AppLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuthStore();
   const { initializeData, isInitialized } = useBudgetStore();
+  
+  // Start auto-logout tracker
+  useAutoLogout();
 
   // Close mobile menu when route changes
   useEffect(() => {
