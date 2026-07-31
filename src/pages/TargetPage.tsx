@@ -36,7 +36,7 @@ export const TargetPage = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Target & Durasi</h2>
-        <p className="text-slate-400 mt-1">Atur parameter dan lihat simulasi *extreme saving* per hari Anda.</p>
+        <p className="text-slate-400 mt-1">Atur parameter dan lihat simulasi SMC per hari kamu #NabungPangkalKaya.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
