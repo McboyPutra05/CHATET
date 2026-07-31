@@ -11,6 +11,7 @@ export const LoginPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successToast, setSuccessToast] = useState(false);
   const navigate = useNavigate();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -35,7 +36,8 @@ export const LoginPage = () => {
           }
         });
         if (error) throw error;
-        alert('Sukses! Silakan cek email Anda untuk verifikasi pendaftaran.');
+        setSuccessToast(true);
+        setTimeout(() => setSuccessToast(false), 5000);
         setIsLogin(true);
       }
     } catch (err: any) {
@@ -63,6 +65,22 @@ export const LoginPage = () => {
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 -z-10" />
       
+      {/* Floating Toast Notification */}
+      <div className={`fixed top-4 right-4 z-50 transition-all duration-500 ease-in-out ${successToast ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0'}`}>
+        <div className="bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md text-emerald-400 p-4 rounded-xl shadow-2xl flex items-start gap-3 max-w-sm">
+          <div className="p-1 bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div>
+            <h4 className="font-bold text-sm mb-1">Pendaftaran Sukses!</h4>
+            <p className="text-xs text-emerald-400/80 leading-relaxed">Silakan cek kotak masuk atau spam email Anda untuk verifikasi pendaftaran sebelum masuk.</p>
+          </div>
+          <button onClick={() => setSuccessToast(false)} className="text-emerald-400/50 hover:text-emerald-400 shrink-0 p-1">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+      </div>
+
       <div className="w-full max-w-md space-y-8 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="text-center">
           <div className="mx-auto w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 shadow-2xl p-2 border border-white/10">

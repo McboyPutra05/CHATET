@@ -18,7 +18,6 @@ export const useAutoLogout = () => {
       // Auto logout on expiration
       await supabase.auth.signOut();
       navigate('/login');
-      alert('Sesi Anda telah berakhir karena tidak ada aktivitas selama 15 menit. Silakan login kembali.');
     }, INACTIVITY_TIMEOUT);
   };
 
