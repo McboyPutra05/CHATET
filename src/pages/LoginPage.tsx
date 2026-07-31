@@ -83,7 +83,7 @@ export const LoginPage = () => {
 
       <div className="w-full max-w-md space-y-8 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="text-center">
-          <div className="mx-auto w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 shadow-2xl p-2 border border-white/10">
+          <div className="mx-auto w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 shadow-2xl p-2 border border-white">
             <img src="/logoChatetIN.png" alt="ChatetIN Logo" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-3xl font-black text-white tracking-tight">ChatetIN</h2>
