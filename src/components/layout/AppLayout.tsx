@@ -42,7 +42,7 @@ export const AppLayout = () => {
       <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-slate-900 z-30">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/5 p-1 flex items-center justify-center">
-            <img src="/logo.png" alt="ChatetIN" className="w-full h-full object-contain" />
+            <img src="/logoChatetIN.png" alt="ChatetIN" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-lg font-bold text-white tracking-tight">ChatetIN</h1>
         </div>
