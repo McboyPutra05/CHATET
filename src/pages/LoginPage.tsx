@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Wallet, Loader2, LogIn, Globe } from 'lucide-react';
+import { Loader2, LogIn, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const LoginPage = () => {
@@ -65,11 +65,11 @@ export const LoginPage = () => {
       
       <div className="w-full max-w-md space-y-8 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-emerald-500/20 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-            <Wallet className="w-8 h-8 text-emerald-400" />
+          <div className="mx-auto w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 shadow-2xl p-2 border border-white/10">
+            <img src="/logo.png" alt="ChatetIN Logo" className="w-full h-full object-contain" />
           </div>
-          <h2 className="text-3xl font-black text-white tracking-tight">X-Saving</h2>
-          <p className="mt-2 text-slate-400">Extreme Saving Mode. Track every penny.</p>
+          <h2 className="text-3xl font-black text-white tracking-tight">ChatetIN</h2>
+          <p className="mt-2 text-slate-400">Pencatat Keuangan Pintar Anda.</p>
         </div>
 
         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl shadow-2xl">

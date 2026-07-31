@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { WalletMinimal, Target, LayoutDashboard, X, LogOut, ChevronUp } from 'lucide-react';
+import { Target, LayoutDashboard, X, LogOut, ChevronUp } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -26,11 +26,11 @@ export const Sidebar = ({ onClose }: SidebarProps) => {
     <aside className="w-full h-full bg-slate-900 border-r border-white/5 flex flex-col">
       <div className="p-6 flex items-center justify-between border-b border-white/5">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-emerald-500/20 rounded-xl">
-            <WalletMinimal className="w-6 h-6 text-emerald-400" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/5 flex items-center justify-center p-1">
+            <img src="/logo.png" alt="ChatetIN Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">X-Saving</h1>
+            <h1 className="text-xl font-bold text-white tracking-tight">ChatetIN</h1>
           </div>
         </div>
         {onClose && (

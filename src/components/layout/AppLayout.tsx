@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { Menu, WalletMinimal, Loader2 } from 'lucide-react';
+import { Menu, Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useBudgetStore } from '../../store/useBudgetStore';
@@ -41,10 +41,10 @@ export const AppLayout = () => {
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-slate-900 z-30">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-emerald-500/20 rounded-xl">
-            <WalletMinimal className="w-5 h-5 text-emerald-400" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/5 p-1 flex items-center justify-center">
+            <img src="/logo.png" alt="ChatetIN" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-lg font-bold text-white tracking-tight">X-Saving</h1>
+          <h1 className="text-lg font-bold text-white tracking-tight">ChatetIN</h1>
         </div>
         <button 
           onClick={() => setIsMobileMenuOpen(true)}
