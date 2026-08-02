@@ -9,9 +9,8 @@ import { useAuthStore } from '../store/useAuthStore';
 
 export const TargetPage = () => {
   const { user } = useAuthStore();
-  const { totalTargetBudget, totalDays, startDate, setBudgetParams, plannedSpends, setPlannedSpend } = useBudgetStore();
-  const [localSpends, setLocalSpends] = useState<Record<string, number>>(plannedSpends);
-  const { simulation } = useSimulation(localSpends);
+  const { totalTargetBudget, totalDays, startDate, setBudgetParams } = useBudgetStore();
+  const { simulation } = useSimulation();
   
   const [formBudget, setFormBudget] = useState(totalTargetBudget);
   const [formDays, setFormDays] = useState(totalDays);
@@ -168,24 +167,14 @@ export const TargetPage = () => {
                       <div className="flex flex-col">
                         <span className="text-xs text-slate-500 font-medium">TERPAKAI AKTUAL</span>
                         <div className="flex items-center gap-2">
-                          <input 
-                            type="number"
-                            placeholder="0"
-                            value={localSpends[day.dateStr] !== undefined ? localSpends[day.dateStr] : (day.actualSpent || '')}
-                            onChange={(e) => {
-                              const val = e.target.value === '' ? undefined : Number(e.target.value);
-                              setLocalSpends(prev => ({ ...prev, [day.dateStr]: val as number }));
-                            }}
-                            onBlur={async (e) => {
-                              if (!user?.id) return;
-                              const val = e.target.value === '' ? 0 : Number(e.target.value);
-                              await setPlannedSpend(day.dateStr, val, user.id);
-                            }}
-                            className={cn(
-                              "bg-slate-950 border rounded-lg px-3 py-1.5 text-sm w-32 outline-none focus:ring-2 focus:ring-emerald-500/50 transition-colors text-right font-bold",
-                              day.isOverspent ? "border-rose-500/50 text-rose-400" : (day.actualSpent > 0 ? "border-slate-700 text-slate-100" : "border-slate-800 text-slate-500")
-                            )}
-                          />
+                          <div className={cn(
+                            "px-4 py-2 rounded-lg text-sm font-bold border",
+                            day.isOverspent 
+                              ? "bg-rose-500/10 border-rose-500/50 text-rose-400" 
+                              : (day.actualSpent > 0 ? "bg-slate-800/50 border-slate-700 text-slate-100" : "bg-slate-900/50 border-slate-800 text-slate-500")
+                          )}>
+                            {day.actualSpent > 0 ? formatIDR(day.actualSpent) : 'Rp 0'}
+                          </div>
                           {day.isOverspent && (
                             <button 
                               type="button"

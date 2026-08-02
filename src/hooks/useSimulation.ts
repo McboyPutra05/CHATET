@@ -13,7 +13,7 @@ export interface SimulationDay {
   remainingDaysAtStart: number;
 }
 
-export const useSimulation = (localPlannedSpends: Record<string, number> = {}) => {
+export const useSimulation = () => {
   const { totalTargetBudget, totalDays, startDate, expenses } = useBudgetStore();
 
   return useMemo(() => {
@@ -39,17 +39,14 @@ export const useSimulation = (localPlannedSpends: Record<string, number> = {}) =
       const dateStr = currentDate.toISOString().split('T')[0];
 
       const remainingBudgetAtStart = totalTargetBudget - cumulativeSpent;
-      const remainingDaysAtStart = totalDays - i; // will be at least 1 since i < totalDays
+      const remainingDaysAtStart = totalDays - i;
       
       const allowanceForDay = remainingBudgetAtStart / remainingDaysAtStart;
-      // Determine logged spend
+      
       let isLogged = false;
       let loggedSpend = 0;
 
-      if (localPlannedSpends[dateStr] !== undefined && localPlannedSpends[dateStr] !== null && !isNaN(localPlannedSpends[dateStr])) {
-        isLogged = true;
-        loggedSpend = localPlannedSpends[dateStr];
-      } else if (expensesByDate[dateStr] !== undefined) {
+      if (expensesByDate[dateStr] !== undefined) {
         isLogged = true;
         loggedSpend = expensesByDate[dateStr];
       }
@@ -87,5 +84,5 @@ export const useSimulation = (localPlannedSpends: Record<string, number> = {}) =
       totalDays,
       startDate
     };
-  }, [totalTargetBudget, totalDays, startDate, expenses, localPlannedSpends]);
+  }, [totalTargetBudget, totalDays, startDate, expenses]);
 };
