@@ -101,7 +101,7 @@ export const ProfilePage = () => {
     }
   };
 
-  const InputField = ({ label, value, field }: { label: string, value: string, field: keyof typeof formData }) => (
+  const renderInputField = (label: string, field: keyof typeof formData) => (
     <div className="space-y-1">
       <p className="text-sm font-medium text-slate-400">{label}</p>
       {isEditing ? (
@@ -112,7 +112,7 @@ export const ProfilePage = () => {
           className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
         />
       ) : (
-        <p className="text-slate-100 font-medium py-2">{value || '-'}</p>
+        <p className="text-slate-100 font-medium py-2">{formData[field] || '-'}</p>
       )}
     </div>
   );
@@ -197,18 +197,18 @@ export const ProfilePage = () => {
       <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl">
         <h3 className="text-lg font-bold text-white mb-6">Personal Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          <InputField label="First Name" value={formData.firstName} field="firstName" />
-          <InputField label="Last Name" value={formData.lastName} field="lastName" />
+          {renderInputField("First Name", "firstName")}
+          {renderInputField("Last Name", "lastName")}
           
           <div className="space-y-1">
             <p className="text-sm font-medium text-slate-400">Email address</p>
             <p className="text-slate-100 font-medium py-2">{user?.email}</p>
           </div>
           
-          <InputField label="Phone" value={formData.phone} field="phone" />
+          {renderInputField("Phone", "phone")}
           
           <div className="md:col-span-2">
-            <InputField label="Bio" value={formData.bio} field="bio" />
+            {renderInputField("Bio", "bio")}
           </div>
         </div>
       </div>
@@ -217,10 +217,10 @@ export const ProfilePage = () => {
       <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl">
         <h3 className="text-lg font-bold text-white mb-6">Address</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          <InputField label="Country" value={formData.country} field="country" />
-          <InputField label="City/State" value={formData.city} field="city" />
-          <InputField label="Postal Code" value={formData.postalCode} field="postalCode" />
-          <InputField label="TAX ID" value={formData.taxId} field="taxId" />
+          {renderInputField("Country", "country")}
+          {renderInputField("City/State", "city")}
+          {renderInputField("Postal Code", "postalCode")}
+          {renderInputField("TAX ID", "taxId")}
         </div>
       </div>
 
