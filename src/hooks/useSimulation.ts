@@ -27,8 +27,8 @@ export const useSimulation = () => {
       expensesByDate[e.date] += e.amount;
     });
 
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
+    const [year, month, day] = startDate.split('-').map(Number);
+    const start = new Date(year, month - 1, day, 0, 0, 0, 0);
 
     const simulation: SimulationDay[] = [];
     let cumulativeSpent = 0;
@@ -36,7 +36,7 @@ export const useSimulation = () => {
     for (let i = 0; i < totalDays; i++) {
       const currentDate = new Date(start);
       currentDate.setDate(currentDate.getDate() + i);
-      const dateStr = currentDate.toISOString().split('T')[0];
+      const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
 
       const remainingBudgetAtStart = totalTargetBudget - cumulativeSpent;
       const remainingDaysAtStart = totalDays - i;

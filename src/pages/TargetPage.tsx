@@ -12,8 +12,8 @@ export const TargetPage = () => {
   const { totalTargetBudget, totalDays, startDate, setBudgetParams } = useBudgetStore();
   const { simulation } = useSimulation();
   
-  const [formBudget, setFormBudget] = useState(totalTargetBudget);
-  const [formDays, setFormDays] = useState(totalDays);
+  const [formBudget, setFormBudget] = useState<number | string>(totalTargetBudget || "");
+  const [formDays, setFormDays] = useState<number | string>(totalDays || "");
   const [formDate, setFormDate] = useState(startDate);
   const [showSaved, setShowSaved] = useState(false);
   const [activeAlertIndex, setActiveAlertIndex] = useState<number | null>(null);
@@ -24,7 +24,7 @@ export const TargetPage = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.id) return;
-    await setBudgetParams(formBudget, formDays, formDate, user.id);
+    await setBudgetParams(Number(formBudget), Number(formDays), formDate, user.id);
     setShowSaved(true);
     setTimeout(() => setShowSaved(false), 3000);
   };

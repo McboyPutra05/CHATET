@@ -13,11 +13,11 @@ export const useAdaptiveBudget = () => {
     const remainingBudget = totalTargetBudget - totalSpent;
 
     // Hitung hari yang sudah berlalu
-    const start = new Date(startDate);
+    const [year, month, day] = startDate.split('-').map(Number);
+    const start = new Date(year, month - 1, day, 0, 0, 0, 0);
     // Ignore time for today
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    start.setHours(0, 0, 0, 0);
     
     const diffTime = today.getTime() - start.getTime();
     // Allow negative days passed if start date is in the future

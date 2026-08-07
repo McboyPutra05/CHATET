@@ -24,8 +24,8 @@ export const ExpenseTable = () => {
   
   // Budget Modal State
   const [showBudgetModal, setShowBudgetModal] = useState(false);
-  const [formBudget, setFormBudget] = useState(0);
-  const [formDays, setFormDays] = useState(0);
+  const [formBudget, setFormBudget] = useState<number | string>("");
+  const [formDays, setFormDays] = useState<number | string>("");
   const [formStartDate, setFormStartDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -60,7 +60,7 @@ export const ExpenseTable = () => {
     e.preventDefault();
     if (!user?.id) return;
     
-    await setBudgetParams(formBudget, formDays, formStartDate, user.id);
+    await setBudgetParams(Number(formBudget), Number(formDays), formStartDate, user.id);
     setShowBudgetModal(false);
     
     // Optionally auto-add the pending expense after setting budget
