@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Plus, Download, Trash2, Target, X } from 'lucide-react';
 
 export const ExpenseTable = () => {
-  const { expenses, addExpense, deleteExpense, budgetId, setBudgetParams } = useBudgetStore();
+  const { expenses, addExpense, deleteExpense, budgetId, setBudgetParams, startDate } = useBudgetStore();
   const { user } = useAuthStore();
   
   // Quick Add Form State
@@ -24,8 +24,8 @@ export const ExpenseTable = () => {
   
   // Budget Modal State
   const [showBudgetModal, setShowBudgetModal] = useState(false);
-  const [formBudget, setFormBudget] = useState(150000);
-  const [formDays, setFormDays] = useState(30);
+  const [formBudget, setFormBudget] = useState(0);
+  const [formDays, setFormDays] = useState(0);
   const [formStartDate, setFormStartDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -233,6 +233,7 @@ export const ExpenseTable = () => {
           <input
             type="date"
             value={date}
+            min={startDate}
             onChange={(e) => setDate(e.target.value)}
             className="md:col-span-1 bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
             required

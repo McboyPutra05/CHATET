@@ -31,8 +31,8 @@ interface BudgetState {
 
 export const useBudgetStore = create<BudgetState>((set, get) => ({
   budgetId: null,
-  totalTargetBudget: 150000,
-  totalDays: 30,
+  totalTargetBudget: 0,
+  totalDays: 0,
   startDate: new Date().toISOString().split('T')[0],
   expenses: [],
   plannedSpends: {},
