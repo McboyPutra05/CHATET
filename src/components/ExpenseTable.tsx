@@ -9,10 +9,10 @@ import { useBudgetStore } from '../store/useBudgetStore';
 import { useAuthStore } from '../store/useAuthStore';
 import type { Expense } from '../store/useBudgetStore';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Plus, Download, Trash2 } from 'lucide-react';
+import { Plus, Download, Trash2, Target, X } from 'lucide-react';
 
 export const ExpenseTable = () => {
-  const { expenses, addExpense, deleteExpense } = useBudgetStore();
+  const { expenses, addExpense, deleteExpense, budgetId, setBudgetParams } = useBudgetStore();
   const { user } = useAuthStore();
   
   // Quick Add Form State
@@ -21,11 +21,28 @@ export const ExpenseTable = () => {
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
+  
+  // Budget Modal State
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [formBudget, setFormBudget] = useState(150000);
+  const [formDays, setFormDays] = useState(30);
+  const [formStartDate, setFormStartDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || isNaN(Number(amount)) || !user?.id) return;
     
+    // Check if user has an active budget
+    if (!budgetId) {
+      setShowBudgetModal(true);
+      return;
+    }
+    
+    await processAddExpense();
+  };
+
+  const processAddExpense = async () => {
+    if (!user?.id) return;
     await addExpense({
       date,
       type,
@@ -37,6 +54,19 @@ export const ExpenseTable = () => {
     // Reset minimal
     setAmount('');
     setNotes('');
+  };
+
+  const handleSetInitialBudget = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.id) return;
+    
+    await setBudgetParams(formBudget, formDays, formStartDate, user.id);
+    setShowBudgetModal(false);
+    
+    // Optionally auto-add the pending expense after setting budget
+    if (amount) {
+      await processAddExpense();
+    }
   };
 
   const exportToCSV = () => {
@@ -134,6 +164,69 @@ export const ExpenseTable = () => {
         </button>
       </CardHeader>
       
+      {/* Budget Required Modal Overlay */}
+      {showBudgetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl relative animate-in zoom-in-95 duration-300">
+            <button 
+              onClick={() => setShowBudgetModal(false)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-800 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 mb-4">
+                <Target className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Tentukan Target Dulu!</h2>
+              <p className="text-sm text-slate-400">
+                Anda belum memiliki target budget yang aktif. Silakan isi target dan durasi baru sebelum mencatat transaksi.
+              </p>
+            </div>
+
+            <form onSubmit={handleSetInitialBudget} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-400">Total Budget (Rp)</label>
+                <input 
+                  type="number" 
+                  value={formBudget}
+                  onChange={(e) => setFormBudget(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-400">Durasi (Hari)</label>
+                <input 
+                  type="number" 
+                  value={formDays}
+                  onChange={(e) => setFormDays(Number(e.target.value))}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-400">Tanggal Mulai</label>
+                <input 
+                  type="date" 
+                  value={formStartDate}
+                  onChange={(e) => setFormStartDate(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                  required
+                />
+              </div>
+              <button 
+                type="submit"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-colors mt-6"
+              >
+                Mulai Budgeting & Simpan
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       <CardContent className="pt-6">
         {/* Quick Add Form */}
         <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-6 gap-3 mb-6 p-4 bg-slate-800/30 rounded-xl border border-slate-700/50">

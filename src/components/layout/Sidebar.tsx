@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Target, LayoutDashboard, X, LogOut, ChevronUp } from 'lucide-react';
+import { Target, LayoutDashboard, X, LogOut, ChevronUp, History } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -16,6 +16,7 @@ export const Sidebar = ({ onClose }: SidebarProps) => {
   const navItems = [
     { name: 'Pencatatan', path: '/', icon: LayoutDashboard },
     { name: 'Target & Durasi', path: '/target', icon: Target },
+    { name: 'Riwayat', path: '/history', icon: History },
   ];
 
   const handleLogout = async () => {
