@@ -29,6 +29,9 @@ export const useSimulation = () => {
 
     const [year, month, day] = startDate.split('-').map(Number);
     const start = new Date(year, month - 1, day, 0, 0, 0, 0);
+    
+    const today = new Date();
+    const todayDateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
     const simulation: SimulationDay[] = [];
     let cumulativeSpent = 0;
@@ -51,8 +54,12 @@ export const useSimulation = () => {
         loggedSpend = expensesByDate[dateStr];
       }
 
-      // If logged, use the logged amount. Otherwise, assume they will perfectly meet the allowance (so target stays flat).
-      const actualSpentForCalc = isLogged ? loggedSpend : allowanceForDay;
+      const isPast = dateStr < todayDateStr;
+
+      // If logged, use the logged amount. 
+      // If NOT logged but it's in the past, they spent 0.
+      // If NOT logged and it's today or future, assume they will perfectly meet the allowance.
+      const actualSpentForCalc = isLogged ? loggedSpend : (isPast ? 0 : allowanceForDay);
       
       const isOverspent = isLogged && loggedSpend > allowanceForDay;
       const overspendAmount = isOverspent ? loggedSpend - allowanceForDay : 0;
