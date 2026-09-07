@@ -12,9 +12,10 @@ export const AppLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuthStore();
-  const { initializeData, isInitialized, totalTargetBudget, endBudget } = useBudgetStore();
-  const { remainingBudget, remainingDays } = useAdaptiveBudget();
+  const { initializeData, isInitialized, totalTargetBudget, totalDays, endBudget } = useBudgetStore();
+  const { remainingBudget, remainingDays, daysPassed } = useAdaptiveBudget();
   const [terminationMessage, setTerminationMessage] = useState<string | null>(null);
+  const [terminationType, setTerminationType] = useState<'success' | 'failure' | null>(null);
   
   useAutoLogout();
 
@@ -33,6 +34,14 @@ export const AppLayout = () => {
     // Only run logic if budget is initialized and active (totalTargetBudget > 0 means we likely have an active budget state loaded)
     if (!isInitialized || totalTargetBudget === 0) return;
     
+    // Check Success condition (time is up and still have money/0)
+    if (daysPassed >= totalDays && remainingBudget >= 0) {
+      setTerminationType('success');
+      setTerminationMessage("GILS LUUUUU! 🎉 Keren banget lu cuy, berhasil survive sampe waktu habis! Sisa duit lu masih sisa Rp" + remainingBudget.toLocaleString('id-ID') + ". Money management lu udah lumayan sepuh nih. Pertahankan pride lu!");
+      endBudget();
+      return;
+    }
+
     // Check if user is out of money or negative
     if (remainingBudget <= 0) {
       const isExtremeEnd = remainingDays <= 2;
@@ -60,12 +69,13 @@ export const AppLayout = () => {
       }
 
       if (message) {
+        setTerminationType('failure');
         setTerminationMessage(message);
         // End the budget officially in the database
         endBudget();
       }
     }
-  }, [remainingBudget, remainingDays, isInitialized, totalTargetBudget, endBudget]);
+  }, [remainingBudget, remainingDays, daysPassed, totalDays, isInitialized, totalTargetBudget, endBudget]);
 
   if (!isInitialized) {
     return (
@@ -79,7 +89,7 @@ export const AppLayout = () => {
     <div className="flex flex-col md:flex-row h-[100dvh] bg-slate-950 text-white overflow-hidden font-sans">
       
       {/* Termination Modal */}
-      {terminationMessage && (
+      {terminationMessage && terminationType === 'failure' && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
           <div className="bg-slate-900 border border-rose-500/30 p-8 rounded-3xl max-w-lg w-full shadow-2xl text-center space-y-6 animate-in zoom-in-95 duration-500">
             <div className="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto animate-pulse">
@@ -92,10 +102,38 @@ export const AppLayout = () => {
               </p>
             </div>
             <button 
-              onClick={() => setTerminationMessage(null)}
+              onClick={() => {
+                setTerminationMessage(null);
+                setTerminationType(null);
+              }}
               className="w-full bg-slate-800 hover:bg-slate-700 text-white py-4 rounded-xl font-bold uppercase tracking-widest transition-colors mt-4"
             >
               Saya Mengerti
+            </button>
+          </div>
+        </div>
+      )}
+
+      {terminationMessage && terminationType === 'success' && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
+          <div className="bg-slate-900 border border-emerald-500/50 p-8 rounded-3xl max-w-lg w-full shadow-2xl text-center space-y-6 animate-in zoom-in-95 duration-500">
+            <div className="text-6xl mx-auto mb-4 animate-bounce">
+              🔥
+            </div>
+            <div>
+              <h2 className="text-3xl font-black text-emerald-400 mb-4 tracking-tight uppercase">MISSION ACCOMPLISHED!</h2>
+              <p className="text-emerald-100 text-lg leading-relaxed font-medium bg-emerald-950/30 p-4 rounded-xl border border-emerald-500/20">
+                {terminationMessage}
+              </p>
+            </div>
+            <button 
+              onClick={() => {
+                setTerminationMessage(null);
+                setTerminationType(null);
+              }}
+              className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-4 rounded-xl font-black uppercase tracking-widest transition-colors mt-4 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+            >
+              Ayo Nabung Lagi!
             </button>
           </div>
         </div>

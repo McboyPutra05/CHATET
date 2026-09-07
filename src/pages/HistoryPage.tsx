@@ -88,9 +88,13 @@ export const HistoryPage = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-slate-400 flex items-center justify-between">
                     <span>Mulai: {new Date(budget.start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                    {isDeficit && (
+                    {isDeficit ? (
                       <span className="flex items-center gap-1 text-xs text-rose-400 bg-rose-500/10 px-2 py-1 rounded border border-rose-500/20">
                         <AlertOctagon className="w-3 h-3" /> Terminated
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
+                        <Wallet className="w-3 h-3" /> Berhasil
                       </span>
                     )}
                   </CardTitle>
@@ -103,7 +107,7 @@ export const HistoryPage = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Total Terpakai</p>
-                      <p className={`text-xl font-bold ${isDeficit ? 'text-rose-400' : 'text-slate-200'}`}>
+                      <p className={`text-xl font-bold ${isDeficit ? 'text-rose-400' : 'text-emerald-400'}`}>
                         {formatCurrency(totalSpent)}
                       </p>
                     </div>
@@ -116,7 +120,7 @@ export const HistoryPage = () => {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-slate-400 justify-end">
                       <Wallet className="w-4 h-4 text-slate-500" />
-                      <span>Defisit: {isDeficit ? formatCurrency(totalSpent - budget.total_budget) : 'Rp 0'}</span>
+                      <span>{isDeficit ? 'Defisit:' : 'Sisa:'} {formatCurrency(Math.abs(budget.total_budget - totalSpent))}</span>
                     </div>
                   </div>
                 </CardContent>
