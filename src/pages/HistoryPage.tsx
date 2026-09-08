@@ -2,7 +2,16 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { supabase } from '../lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { History, Loader2, CalendarDays, Wallet, AlertOctagon } from 'lucide-react';
+import { History, Loader2, CalendarDays, Wallet, AlertOctagon, Download } from 'lucide-react';
+
+interface Expense {
+  id: string;
+  amount: number;
+  type: string;
+  date: string;
+  note: string;
+  category: string;
+}
 
 interface BudgetHistory {
   id: string;
@@ -10,7 +19,7 @@ interface BudgetHistory {
   total_days: number;
   start_date: string;
   created_at: string;
-  expenses: { amount: number; type: string }[];
+  expenses: Expense[];
 }
 
 export const HistoryPage = () => {
@@ -24,7 +33,7 @@ export const HistoryPage = () => {
       try {
         const { data, error } = await supabase
           .from('budgets')
-          .select('*, expenses(amount, type)')
+          .select('*, expenses(*)')
           .eq('user_id', user.id)
           .eq('is_active', false)
           .order('created_at', { ascending: false });
@@ -40,6 +49,42 @@ export const HistoryPage = () => {
     
     fetchHistory();
   }, [user?.id]);
+
+  const handleExportCSV = (budget: BudgetHistory) => {
+    // Define headers
+    const headers = ['Tanggal', 'Tipe', 'Kategori', 'Nominal', 'Catatan'];
+    
+    // Convert expenses to CSV rows
+    const rows = budget.expenses.map(exp => [
+      exp.date,
+      exp.type === 'in' ? 'Pemasukan' : 'Pengeluaran',
+      exp.category || '-',
+      exp.amount.toString(),
+      `"${(exp.note || '').replace(/"/g, '""')}"` // Escape quotes
+    ]);
+    
+    // Add Summary at the end
+    const totalSpent = budget.expenses.filter(e => e.type === 'out').reduce((sum, e) => sum + e.amount, 0);
+    rows.push(['', '', '', '', '']);
+    rows.push(['TARGET BUDGET', '', '', budget.total_budget.toString(), '']);
+    rows.push(['TOTAL TERPAKAI', '', '', totalSpent.toString(), '']);
+    rows.push([totalSpent > budget.total_budget ? 'DEFISIT' : 'SISA', '', '', Math.abs(budget.total_budget - totalSpent).toString(), '']);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `ChatetIN_Export_${budget.start_date}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   if (isLoading) {
     return (
@@ -123,6 +168,14 @@ export const HistoryPage = () => {
                       <span>{isDeficit ? 'Defisit:' : 'Sisa:'} {formatCurrency(Math.abs(budget.total_budget - totalSpent))}</span>
                     </div>
                   </div>
+                  
+                  <button
+                    onClick={() => handleExportCSV(budget)}
+                    className="w-full mt-4 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 border border-slate-700"
+                  >
+                    <Download className="w-4 h-4" />
+                    Export ke CSV
+                  </button>
                 </CardContent>
               </Card>
             );
